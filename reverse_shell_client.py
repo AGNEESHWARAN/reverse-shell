@@ -32,6 +32,8 @@ def do_something():
 		
 		while True:
 			cmd = input('>>')
+			if cmd=='exit' or cmd=='EXIT':
+				break
 			conn.sendall(str.encode(cmd))
 			response =str(conn.recv(20480),"utf-8")
 			print(response)		
