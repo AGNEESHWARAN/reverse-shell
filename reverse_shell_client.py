@@ -4,7 +4,7 @@ s=socket.socket()
 
 def connect_serv():
 	try:
-		s.connect(('192.168.1.102',9999))
+		s.connect(('192.168.1.102',9949))
 	except:
 		print("reconnecting!!")
 		connect_serv()
